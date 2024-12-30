@@ -20,7 +20,7 @@ public class AuthResource {
                 .build();
         }
 
-        user.passwordHash = PasswordUtils.hashPassword(user.passwordHash); // Hash the password
+        user.password = PasswordUtils.hashPassword(user.password); // Hash the password
         user.persist();
         return Response.ok("User registered successfully").build();
     }

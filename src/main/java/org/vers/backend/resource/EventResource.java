@@ -50,7 +50,7 @@ public class EventResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         event.type = updatedEvent.type;
-        event.date = updatedEvent.date;
+        event.createdAt = updatedEvent.createdAt;
         event.location = updatedEvent.location;
         event.persist();
         return Response.ok(event).build();
