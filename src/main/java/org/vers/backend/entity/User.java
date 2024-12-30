@@ -20,6 +20,8 @@ public class User extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
+    public String username;
+
     public String firstName;
     public String middleName;
     public String lastName;
