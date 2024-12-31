@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import org.vers.backend.enums.EventType;
 
 @Entity
 public class Report extends PanacheEntityBase {
