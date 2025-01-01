@@ -1,9 +1,6 @@
 package org.vers.backend.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,61 +11,88 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
-import java.util.List;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
 import org.vers.backend.enums.EventStatus;
 import org.vers.backend.enums.EventType;
 import org.vers.backend.validation.ValidLocation;
 
 @Entity
+@Table(name = "Event")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "event_type")
-public abstract class Event extends PanacheEntityBase {
+public abstract class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EventType type;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "registrar_id")
-    public User registeredBy;
+    @JoinColumn(name = "registrar_id", nullable = false)
+    private User registrar;
 
-    @Enumerated(EnumType.STRING)
-    public EventType type;
-
+    @ManyToOne
     @ValidLocation
-    @Embedded
-    @Column(nullable = false)
-    public Location location;
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
 
-    @Enumerated(EnumType.STRING)
-    public EventStatus status;
+    // Getters and setters
 
-    @Column(nullable = false, updatable = false)
-    public LocalDateTime createdAt;
-
-    public Event() {
-        this.createdAt = LocalDateTime.now();
-        this.status = EventStatus.PENDING;
+    public Long getId() {
+        return id;
     }
 
-    public void approve() {
-        this.status = EventStatus.APPROVED;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void reject() {
-        this.status = EventStatus.REJECTED;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public boolean isType(EventType type) {
-        return this.type == type;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public static List<Event> findByRegistrar(Long registrarId) {
-        return list("registrar.id", registrarId);
+    public EventType getType() {
+        return type;
     }
 
-    public static List<Event> findByStatus(EventStatus status) {
-        return list("status", status);
+    public void setType(EventType type) {
+        this.type = type;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+
+    public User getRegistrar() {
+        return registrar;
+    }
+
+    public void setRegistrar(User registrar) {
+        this.registrar = registrar;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

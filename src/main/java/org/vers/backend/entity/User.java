@@ -1,33 +1,20 @@
 package org.vers.backend.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.List;
 import java.util.Objects;
-import org.vers.backend.enums.Gender;
-import org.vers.backend.enums.Role;
 import org.vers.backend.utils.PasswordUtils;
-import org.vers.backend.validation.InternationalPhone;
 
 @Entity
-public class User extends PanacheEntityBase {
+@Table(name = "User")
+public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "id", nullable = false, unique = true)
+    private String id; // Links to Person's national_id
 
     @NotBlank(message = "Username is required")
     @Size(
@@ -35,43 +22,42 @@ public class User extends PanacheEntityBase {
         max = 20,
         message = "Username must be between 4 and 20 characters"
     )
-    public String username;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 20, message = "Password must be at least 8 characters")
-    public String password; // Hashed
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Column(name = "password", nullable = false)
+    private String password; // Hashed password
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    public Role role;
-
-    @Embedded
-    public Name name;
-
-    @Enumerated(EnumType.STRING)
-    public Gender gender;
-
-    public LocalDate dateOfBirth;
+    @NotBlank(message = "Role is required")
+    @Column(name = "role", nullable = false)
+    private String role; // Using a String for roles to match the database schema
 
     @Email(message = "Invalid email address")
-    public String email;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
-    @InternationalPhone(
-        message = "Phone number must be in valid international format"
-    )
-    public String phoneNumber;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false, updatable = false)
-    public LocalDateTime createdAt;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
-    public boolean isActive;
-
+    // Constructors
     public User() {
         this.createdAt = LocalDateTime.now();
         this.isActive = true;
     }
 
-    public User(String username, String passwordHash, String email, Role role) {
+    public User(
+        String id,
+        String username,
+        String passwordHash,
+        String email,
+        String role
+    ) {
+        this.id = id;
         this.username = username;
         this.password = passwordHash;
         this.email = email;
@@ -80,8 +66,25 @@ public class User extends PanacheEntityBase {
         this.isActive = true;
     }
 
-    public boolean hasRole(Role role) {
-        return this.role == role;
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String plainPassword) {
@@ -92,21 +95,35 @@ public class User extends PanacheEntityBase {
         return PasswordUtils.verifyPassword(plainPassword, this.password);
     }
 
-    public int getAge() {
-        if (dateOfBirth == null) {
-            throw new IllegalStateException("Date of birth not set");
-        }
-        return Period.between(this.dateOfBirth, LocalDate.now()).getYears();
+    public String getRole() {
+        return role;
     }
 
-    public static User findByUsername(String username) {
-        return find("username", username).firstResult();
+    public void setRole(String role) {
+        this.role = role;
     }
 
-    public static List<User> findActiveUsers() {
-        return list("isActive", true);
+    public String getEmail() {
+        return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    // Utility Methods
     public void deactivate() {
         this.isActive = false;
     }
@@ -119,18 +136,20 @@ public class User extends PanacheEntityBase {
     public String toString() {
         return (
             "User{" +
-            "id=" +
-            this.id +
+            "id='" +
+            id +
+            '\'' +
             ", username='" +
-            this.username +
+            username +
             '\'' +
             ", email='" +
-            this.email +
+            email +
             '\'' +
-            ", role=" +
-            this.role +
+            ", role='" +
+            role +
+            '\'' +
             ", isActive=" +
-            this.isActive +
+            isActive +
             '}'
         );
     }
@@ -141,18 +160,13 @@ public class User extends PanacheEntityBase {
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
         return (
-            Objects.equals(this.id, user.id) &&
-            Objects.equals(this.username, user.username)
+            Objects.equals(id, user.id) &&
+            Objects.equals(username, user.username)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, username);
-    }
-
-    public String getMaskedEmail() {
-        int index = email.indexOf("@");
-        return email.substring(0, 2) + "****" + email.substring(index);
+        return Objects.hash(id, username);
     }
 }

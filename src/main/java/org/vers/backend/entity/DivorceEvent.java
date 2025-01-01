@@ -1,38 +1,80 @@
 package org.vers.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "DivorceEvent")
 public class DivorceEvent extends Event {
 
-    @Embedded
-    @Column(nullable = false)
-    private Name maleSpouseName;
+    @ManyToOne
+    @JoinColumn(name = "male_spouse_id", nullable = false)
+    private Person maleSpouse;
 
-    @Embedded
-    @Column(nullable = false)
-    private Name femaleSpouseName;
+    @ManyToOne
+    @JoinColumn(name = "female_spouse_id", nullable = false)
+    private Person femaleSpouse;
 
-    public DivorceEvent(Name maleSpouseName, Name femaleSpouseName) {
-        this.maleSpouseName = maleSpouseName;
-        this.femaleSpouseName = femaleSpouseName;
+    @ManyToOne
+    @JoinColumn(name = "court_id", nullable = false)
+    private Court court;
+
+    // Constructors
+    public DivorceEvent() {}
+
+    public DivorceEvent(Person maleSpouse, Person femaleSpouse, Court court) {
+        this.maleSpouse = maleSpouse;
+        this.femaleSpouse = femaleSpouse;
+        this.court = court;
     }
 
-    public Name getFemaleSpouseName() {
-        return this.femaleSpouseName;
+    // Getters and Setters
+    public Person getMaleSpouse() {
+        return maleSpouse;
     }
 
-    public void setFemaleSpouseName(Name femaleSpouseName) {
-        this.femaleSpouseName = femaleSpouseName;
+    public void setMaleSpouse(Person maleSpouse) {
+        this.maleSpouse = maleSpouse;
     }
 
-    public Name getMaleSpouseName() {
-        return this.maleSpouseName;
+    public Person getFemaleSpouse() {
+        return femaleSpouse;
     }
 
-    public void setMaleSpouseName(Name maleSpouseName) {
-        this.maleSpouseName = maleSpouseName;
+    public void setFemaleSpouse(Person femaleSpouse) {
+        this.femaleSpouse = femaleSpouse;
+    }
+
+    public Court getCourt() {
+        return court;
+    }
+
+    public void setCourt(Court court) {
+        this.court = court;
+    }
+
+    // Utility Methods
+    public String getMaleSpouseFullName() {
+        return maleSpouse.getFullName();
+    }
+
+    public String getFemaleSpouseFullName() {
+        return femaleSpouse.getFullName();
+    }
+
+    @Override
+    public String toString() {
+        return (
+            "DivorceEvent{" +
+            "maleSpouse=" +
+            maleSpouse.getFullName() +
+            ", femaleSpouse=" +
+            femaleSpouse.getFullName() +
+            ", court=" +
+            court.getName() +
+            '}'
+        );
     }
 }
