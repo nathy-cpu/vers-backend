@@ -1,11 +1,13 @@
 package org.vers.backend.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Embeddable
+@Entity
+@Table(name = "Location")
 public class Location {
 
     public static final String country = "Ethiopia";
@@ -14,13 +16,13 @@ public class Location {
     @JoinColumn(name = "region_id", nullable = false)
     public Region region;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "zone")
     public String zone;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "woreda")
     public String woreda;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "kebele")
     public String kebele;
 
     public Location(Region region, String zone, String woreda, String kebele) {

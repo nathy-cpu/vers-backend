@@ -1,84 +1,79 @@
 package org.vers.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "Marriage")
 public class MarriageEvent extends Event {
 
-    @Embedded
-    @NotBlank(message = "Male spouse name is rquired")
-    private Name maleSpouseName;
+    @JoinColumn(name = "male_spouse_id", nullable = false)
+    private Person maleSpouse;
 
-    @Embedded
-    @NotBlank(message = "Female spouse name is rquired")
-    private Name femaleSpouseName;
+    @JoinColumn(name = "female_spouse_id", nullable = false)
+    private Person femaleSpouse;
 
-    @Embedded
-    @Column(nullable = false)
-    private Name witnessOne;
+    @JoinColumn(name = "witness_one_id", nullable = false)
+    private String witnessOne;
 
-    @Embedded
-    @Column(nullable = false)
-    private Name witnessTwo;
+    @JoinColumn(name = "witness_two_id", nullable = false)
+    private Person witnessTwo;
 
-    @Embedded
-    @Column(nullable = false)
-    private Name witnessThree;
+    @JoinColumn(name = "witness_three_id", nullable = false)
+    private Person witnessThree;
 
     public MarriageEvent(
-        Name maleSpouseName,
-        Name femaleSpouseName,
-        Name witnessOne,
-        Name witnessTwo,
-        Name witnessThree
+        Person maleSpouse,
+        Person femaleSpouse,
+        String witnessOne,
+        Person witnessTwo,
+        Person witnessThree
     ) {
-        this.maleSpouseName = maleSpouseName;
-        this.femaleSpouseName = femaleSpouseName;
+        this.maleSpouse = maleSpouse;
+        this.femaleSpouse = femaleSpouse;
         this.witnessOne = witnessOne;
         this.witnessTwo = witnessTwo;
         this.witnessThree = witnessThree;
     }
 
-    public Name getFemaleSpouseName() {
-        return this.femaleSpouseName;
+    public Person getMaleSpouse() {
+        return maleSpouse;
     }
 
-    public void setFemaleSpouseName(Name femaleSpouseName) {
-        this.femaleSpouseName = femaleSpouseName;
+    public void setMaleSpouse(Person maleSpouse) {
+        this.maleSpouse = maleSpouse;
     }
 
-    public Name getMaleSpouseName() {
-        return this.maleSpouseName;
+    public Person getFemaleSpouse() {
+        return femaleSpouse;
     }
 
-    public void setMaleSpouseName(Name maleSpouseName) {
-        this.maleSpouseName = maleSpouseName;
+    public void setFemaleSpouse(Person femaleSpouse) {
+        this.femaleSpouse = femaleSpouse;
     }
 
-    public Name getWitnessOne() {
+    public String getWitnessOne() {
         return witnessOne;
     }
 
-    public void setWitnessOne(Name witnessOne) {
+    public void setWitnessOne(String witnessOne) {
         this.witnessOne = witnessOne;
     }
 
-    public Name getWitnessTwo() {
+    public Person getWitnessTwo() {
         return witnessTwo;
     }
 
-    public void setWitnessTwo(Name witnessTwo) {
+    public void setWitnessTwo(Person witnessTwo) {
         this.witnessTwo = witnessTwo;
     }
 
-    public Name getWitnessThree() {
-        return this.witnessThree;
+    public Person getWitnessThree() {
+        return witnessThree;
     }
 
-    public void setWitnessThree(Name witnessThree) {
+    public void setWitnessThree(Person witnessThree) {
         this.witnessThree = witnessThree;
     }
 }

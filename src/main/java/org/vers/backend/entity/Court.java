@@ -1,38 +1,41 @@
 package org.vers.backend.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import org.vers.backend.enums.CourtType;
 import org.vers.backend.enums.Jurisdiction;
 import org.vers.backend.validation.ValidLocation;
 
 @Entity
+@Table(name = "Court")
 public class Court {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "name")
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "type")
     private CourtType type;
 
-    @Embedded
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
     @ValidLocation
-    @Column(nullable = false)
     private Location location;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "jurisdiction")
     private Jurisdiction jurisdiction;
 
     public Court(
