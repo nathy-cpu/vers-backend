@@ -1,71 +1,71 @@
 package org.vers.backend.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import java.time.LocalDate;
+import org.vers.backend.enums.Gender;
 
 @Entity
-@Table(name = "BirthEvent")
+@DiscriminatorValue("BIRTH")
 public class BirthEvent extends Event {
 
-    @ManyToOne
-    @JoinColumn(name = "child_id", nullable = false)
-    private Person child;
+    @Column(nullable = false)
+    public String childName;
 
-    @ManyToOne
-    @JoinColumn(name = "father_id", nullable = false)
-    private Person father;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    public Gender gender;
 
-    @ManyToOne
-    @JoinColumn(name = "mother_id", nullable = false)
-    private Person mother;
+    @Column(nullable = false)
+    public String fatherName;
 
-    @Column(name = "birth_weight", nullable = false)
-    private Float birthWeight;
+    @Column(nullable = false)
+    public String motherName;
+
+    @Column
+    public Float birthWeight;
+
+    @Column(nullable = false)
+    public LocalDate dateOfBirth;
+
+    public BirthEvent() {}
 
     public BirthEvent(
-        Person child,
-        Person father,
-        Person mother,
-        Float birthWeight
+        String childName,
+        String fatherName,
+        String motherName,
+        Gender gender,
+        Float birthWeight,
+        LocalDate dateOfBirth
     ) {
-        this.child = child;
-        this.father = father;
-        this.mother = mother;
-        this.birthWeight = birthWeight;
+        this.childName = childName;
+        this.fatherName = fatherName;
+        this.motherName = motherName;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
     }
 
-    public Person getChild() {
-        return child;
-    }
-
-    public void setChild(Person child) {
-        this.child = child;
-    }
-
-    public Person getFather() {
-        return father;
-    }
-
-    public void setFather(Person father) {
-        this.father = father;
-    }
-
-    public Person getMother() {
-        return mother;
-    }
-
-    public void setMother(Person mother) {
-        this.mother = mother;
-    }
-
-    public Float getBirthWeight() {
-        return birthWeight;
-    }
-
-    public void setBirthWeight(Float birthWeight) {
-        this.birthWeight = birthWeight;
+    @Override
+    public String toString() {
+        return (
+            "BirthEvent{" +
+            "childName='" +
+            this.childName +
+            '\'' +
+            ", fatherName='" +
+            this.fatherName +
+            '\'' +
+            ", motherName='" +
+            this.motherName +
+            '\'' +
+            ", birthWeight=" +
+            this.birthWeight +
+            ", dateOfBirth=" +
+            this.dateOfBirth.toString() +
+            "}"
+        );
     }
 }

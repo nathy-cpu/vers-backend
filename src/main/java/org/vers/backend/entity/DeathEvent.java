@@ -1,57 +1,54 @@
 package org.vers.backend.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "DeathEvent")
+@DiscriminatorValue("DEATH")
 public class DeathEvent extends Event {
 
-    @JoinColumn(name = "deceased_id", nullable = false)
-    private Person deceasedID;
+    @Column(nullable = false)
+    public String deceasedName;
 
-    @NotBlank(message = "Cause of death is required")
-    @Column(name = "cause_of_death", nullable = false)
-    private String causeOfDeath;
+    @Column(nullable = false)
+    public String causeOfDeath;
 
-    @NotBlank(message = "Certifier details are required")
-    @JoinColumn(name = "certifier_id", nullable = false)
-    private String certifier; // e.g., doctor or institution
+    @Column(nullable = false)
+    public String certifierName;
+
+    @Column(nullable = false)
+    public LocalDate dateOfDeath;
+
+    public DeathEvent() {
+    }
 
     public DeathEvent(
-        Person deceasedID,
-        String causeOfDeath,
-        String certifier
-    ) {
-        this.deceasedID = deceasedID;
-        this.causeOfDeath = causeOfDeath;
-        this.certifier = certifier;
-    }
-
-    public Person getDeceasedID() {
-        return deceasedID;
-    }
-
-    public void setDeceasedID(Person deceasedID) {
-        this.deceasedID = deceasedID;
-    }
-
-    public String getCauseOfDeath() {
-        return causeOfDeath;
-    }
-
-    public void setCauseOfDeath(String causeOfDeath) {
+            String deceasedName,
+            String causeOfDeath,
+            String certifierName,
+            LocalDate dateOfDeath) {
+        this.deceasedName = deceasedName;
+        this.certifierName = certifierName;
+        this.dateOfDeath = dateOfDeath;
         this.causeOfDeath = causeOfDeath;
     }
 
-    public String getCertifier() {
-        return certifier;
-    }
-
-    public void setCertifier(String certifier) {
-        this.certifier = certifier;
+    @Override
+    public String toString() {
+        return ("DeathEvent{" +
+                "deceasedName='" +
+                deceasedName +
+                '\'' +
+                ", causeOfDeath='" +
+                causeOfDeath +
+                '\'' +
+                ", certifierName='" +
+                certifierName +
+                '\'' +
+                ", dateOfDeath=" +
+                dateOfDeath +
+                '}');
     }
 }

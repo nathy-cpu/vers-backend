@@ -9,17 +9,15 @@ import org.vers.backend.entity.Location;
 public class LocationRepository implements PanacheRepository<Location> {
 
     public Optional<Location> findByCompositeKey(
-        Integer regionId,
+        String region,
         String zone,
-        String woreda,
-        String kebele
+        String woreda
     ) {
         return find(
-            "region_id = ?1 and zone = ?2 and woreda = ?3 and kebele = ?4",
-            regionId,
+            "region = ?1 and zone = ?2 and woreda = ?3",
+            region,
             zone,
-            woreda,
-            kebele
+            woreda
         ).firstResultOptional();
     }
 }

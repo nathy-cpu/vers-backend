@@ -1,79 +1,72 @@
 package org.vers.backend.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "Marriage")
+@DiscriminatorValue("MARRIAGE")
 public class MarriageEvent extends Event {
 
-    @JoinColumn(name = "male_spouse_id", nullable = false)
-    private Person maleSpouse;
+    @Column(nullable = false)
+    public String maleSpouseName;
 
-    @JoinColumn(name = "female_spouse_id", nullable = false)
-    private Person femaleSpouse;
+    @Column(nullable = false)
+    public String femaleSpouseName;
 
-    @JoinColumn(name = "witness_one_id", nullable = false)
-    private String witnessOne;
+    @Column(nullable = false)
+    public String witnessOneName;
 
-    @JoinColumn(name = "witness_two_id", nullable = false)
-    private Person witnessTwo;
+    @Column(nullable = false)
+    public String witnessTwoName;
 
-    @JoinColumn(name = "witness_three_id", nullable = false)
-    private Person witnessThree;
+    @Column(nullable = false)
+    public String certifierName;
+
+    @Column(nullable = false)
+    public LocalDate dateOfMarriage;
+
+    public MarriageEvent() {}
 
     public MarriageEvent(
-        Person maleSpouse,
-        Person femaleSpouse,
-        String witnessOne,
-        Person witnessTwo,
-        Person witnessThree
+        String maleSpouseName,
+        String femaleSpouseName,
+        String witnessOneName,
+        String witnessTwoName,
+        String certifierName,
+        LocalDate dateOfMarriage
     ) {
-        this.maleSpouse = maleSpouse;
-        this.femaleSpouse = femaleSpouse;
-        this.witnessOne = witnessOne;
-        this.witnessTwo = witnessTwo;
-        this.witnessThree = witnessThree;
+        this.certifierName = certifierName;
+        this.dateOfMarriage = dateOfMarriage;
+        this.femaleSpouseName = femaleSpouseName;
+        this.maleSpouseName = maleSpouseName;
+        this.witnessOneName = witnessOneName;
+        this.witnessTwoName = witnessTwoName;
     }
 
-    public Person getMaleSpouse() {
-        return maleSpouse;
-    }
-
-    public void setMaleSpouse(Person maleSpouse) {
-        this.maleSpouse = maleSpouse;
-    }
-
-    public Person getFemaleSpouse() {
-        return femaleSpouse;
-    }
-
-    public void setFemaleSpouse(Person femaleSpouse) {
-        this.femaleSpouse = femaleSpouse;
-    }
-
-    public String getWitnessOne() {
-        return witnessOne;
-    }
-
-    public void setWitnessOne(String witnessOne) {
-        this.witnessOne = witnessOne;
-    }
-
-    public Person getWitnessTwo() {
-        return witnessTwo;
-    }
-
-    public void setWitnessTwo(Person witnessTwo) {
-        this.witnessTwo = witnessTwo;
-    }
-
-    public Person getWitnessThree() {
-        return witnessThree;
-    }
-
-    public void setWitnessThree(Person witnessThree) {
-        this.witnessThree = witnessThree;
+    @Override
+    public String toString() {
+        return (
+            "MarriageEvent{" +
+            "maleSpouseName='" +
+            this.maleSpouseName +
+            '\'' +
+            ", femaleSpouseName='" +
+            this.femaleSpouseName +
+            '\'' +
+            ", witnessOneName='" +
+            this.witnessOneName +
+            '\'' +
+            ", witnessTwoName='" +
+            this.witnessTwoName +
+            '\'' +
+            ", certifierName='" +
+            this.certifierName +
+            '\'' +
+            ", dateOfMarriage=" +
+            this.dateOfMarriage +
+            '}'
+        );
     }
 }

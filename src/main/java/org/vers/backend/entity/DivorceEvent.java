@@ -1,80 +1,54 @@
 package org.vers.backend.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "DivorceEvent")
+@DiscriminatorValue("DIVORCE")
 public class DivorceEvent extends Event {
 
-    @ManyToOne
-    @JoinColumn(name = "male_spouse_id", nullable = false)
-    private Person maleSpouse;
+    @Column(nullable = false)
+    public String maleSpouseName;
 
-    @ManyToOne
-    @JoinColumn(name = "female_spouse_id", nullable = false)
-    private Person femaleSpouse;
+    @Column(nullable = false)
+    public String femaleSpouseName;
 
-    @ManyToOne
-    @JoinColumn(name = "court_id", nullable = false)
-    private Court court;
+    @Column(nullable = false)
+    public String courtName;
 
-    // Constructors
-    public DivorceEvent() {}
+    @Column(nullable = false)
+    public LocalDate dateOfDivorce;
 
-    public DivorceEvent(Person maleSpouse, Person femaleSpouse, Court court) {
-        this.maleSpouse = maleSpouse;
-        this.femaleSpouse = femaleSpouse;
-        this.court = court;
+    public DivorceEvent() {
     }
 
-    // Getters and Setters
-    public Person getMaleSpouse() {
-        return maleSpouse;
-    }
-
-    public void setMaleSpouse(Person maleSpouse) {
-        this.maleSpouse = maleSpouse;
-    }
-
-    public Person getFemaleSpouse() {
-        return femaleSpouse;
-    }
-
-    public void setFemaleSpouse(Person femaleSpouse) {
-        this.femaleSpouse = femaleSpouse;
-    }
-
-    public Court getCourt() {
-        return court;
-    }
-
-    public void setCourt(Court court) {
-        this.court = court;
-    }
-
-    // Utility Methods
-    public String getMaleSpouseFullName() {
-        return maleSpouse.getFullName();
-    }
-
-    public String getFemaleSpouseFullName() {
-        return femaleSpouse.getFullName();
+    public DivorceEvent(
+            String maleSpouseName,
+            String femaleSpouseName,
+            String courtName,
+            LocalDate dateOfDivorce) {
+        this.maleSpouseName = maleSpouseName;
+        this.femaleSpouseName = femaleSpouseName;
+        this.courtName = courtName;
+        this.dateOfDivorce = dateOfDivorce;
     }
 
     @Override
     public String toString() {
-        return (
-            "DivorceEvent{" +
-            "maleSpouse=" +
-            maleSpouse.getFullName() +
-            ", femaleSpouse=" +
-            femaleSpouse.getFullName() +
-            ", court=" +
-            court.getName() +
-            '}'
-        );
+        return ("DivorceEvent{" +
+                "maleSpouseName='" +
+                this.maleSpouseName +
+                '\'' +
+                ", femaleSpouseName='" +
+                this.femaleSpouseName +
+                '\'' +
+                ", courtName='" +
+                this.courtName +
+                '\'' +
+                ", dateOfDivorce=" +
+                this.dateOfDivorce.toString() +
+                '}');
     }
 }

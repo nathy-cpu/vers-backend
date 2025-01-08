@@ -15,15 +15,13 @@ public class LocationValidator
         if (location == null) return false;
 
         return (
-            Location.country != null &&
-            !Location.country.isBlank() &&
+            location.country != null &&
+            !location.country.isBlank() &&
             location.region != null &&
             location.zone != null &&
             !location.zone.isBlank() &&
             location.woreda != null &&
-            !location.woreda.isBlank() &&
-            location.kebele != null &&
-            !location.kebele.isBlank()
+            !location.woreda.isBlank()
         );
     }
 }
