@@ -1,46 +1,60 @@
 package org.vers.backend.entity;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "Location")
-public class Location {
+@Table(
+    uniqueConstraints = @UniqueConstraint(
+        columnNames = { "region", "zone", "woreda" }
+    )
+)
+public class Location extends PanacheEntity {
 
-    public static final String country = "Ethiopia";
+    @Column(nullable = false, columnDefinition = "varchar default 'Ethiopia'")
+    public String country;
 
-    @ManyToOne
-    @JoinColumn(name = "region_id", nullable = false)
-    public Region region;
+    @Column(nullable = false)
+    public String region;
 
-    @Column(nullable = false, name = "zone")
+    @Column(nullable = false)
     public String zone;
 
-    @Column(nullable = false, name = "woreda")
+    @Column(nullable = false)
     public String woreda;
 
-    @Column(nullable = false, name = "kebele")
-    public String kebele;
+    public Location() {
+        this.country = "Ethiopia";
+    }
 
-    public Location(Region region, String zone, String woreda, String kebele) {
+    public Location(String region, String zone, String woreda) {
         this.region = region;
         this.zone = zone;
-        this.kebele = kebele;
         this.woreda = woreda;
+        this.country = "Ethiopia";
     }
 
     @Override
     public String toString() {
-        return String.format(
-            "%s, %s, %s, %s, %s",
-            country,
-            this.region.getName(),
-            this.zone,
-            this.woreda,
-            this.kebele
+        return (
+            "Location{" +
+            "id=" +
+            id +
+            ", country='" +
+            country +
+            '\'' +
+            ", region=" +
+            region +
+            ", zone='" +
+            zone +
+            '\'' +
+            ", woreda='" +
+            woreda +
+            '\'' +
+            '}'
         );
     }
 }

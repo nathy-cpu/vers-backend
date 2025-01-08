@@ -1,145 +1,85 @@
 package org.vers.backend.entity;
 
-import jakarta.persistence.*;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.vers.backend.enums.Role;
 import org.vers.backend.utils.PasswordUtils;
 
 @Entity
-@Table(name = "User")
-public class User {
+@Table(name = "\"User\"")
+public class User extends PanacheEntityBase {
 
     @Id
-    @Column(name = "id", nullable = false, unique = true)
-    private String id; // Links to Person's national_id
-
-    @NotBlank(message = "Username is required")
+    @Column(unique = true, nullable = false)
     @Size(
         min = 4,
-        max = 20,
-        message = "Username must be between 4 and 20 characters"
+        max = 64,
+        message = "Username must be between 4 and 64 characters"
     )
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+    public String username;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
-    @Column(name = "password", nullable = false)
-    private String password; // Hashed password
+    public String password; // Hashed password
 
-    @NotBlank(message = "Role is required")
-    @Column(name = "role", nullable = false)
-    private String role; // Using a String for roles to match the database schema
+    @NotNull(message = "Role is required")
+    @Enumerated(EnumType.STRING)
+    public Role role; // Using a String for roles to match the database schema
 
     @Email(message = "Invalid email address")
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false, unique = true)
+    public String email;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @PastOrPresent
+    @Column(nullable = false, updatable = false)
+    public LocalDateTime createdAt;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
-
-    // Constructors
     public User() {
         this.createdAt = LocalDateTime.now();
-        this.isActive = true;
+    }
+
+    // Constructors
+    public User(@NotBlank(message = "Role is required") Role role) {
+        this.createdAt = LocalDateTime.now();
+        this.role = role;
+    }
+
+    public User(String username, Role role) {
+        this.createdAt = LocalDateTime.now();
+        this.username = username;
+        this.role = role;
     }
 
     public User(
-        String id,
         String username,
-        String passwordHash,
+        String plainPassword,
         String email,
-        String role
+        @NotBlank(message = "Role is required") Role role
     ) {
-        this.id = id;
         this.username = username;
-        this.password = passwordHash;
+        this.setPassword(plainPassword);
         this.email = email;
         this.role = role;
         this.createdAt = LocalDateTime.now();
-        this.isActive = true;
-    }
-
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String plainPassword) {
-        this.password = PasswordUtils.hashPassword(plainPassword);
-    }
-
-    public boolean verifyPassword(String plainPassword) {
-        return PasswordUtils.verifyPassword(plainPassword, this.password);
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    // Utility Methods
-    public void deactivate() {
-        this.isActive = false;
-    }
-
-    public void activate() {
-        this.isActive = true;
     }
 
     @Override
     public String toString() {
         return (
             "User{" +
-            "id='" +
-            id +
-            '\'' +
-            ", username='" +
+            "username='" +
             username +
             '\'' +
             ", email='" +
@@ -148,25 +88,32 @@ public class User {
             ", role='" +
             role +
             '\'' +
-            ", isActive=" +
-            isActive +
             '}'
         );
+    }
+
+    public boolean verifyPassword(String plainPassword) {
+        return PasswordUtils.verifyPassword(plainPassword, this.password);
+    }
+
+    public void setPassword(String plainPassword) {
+        this.password = PasswordUtils.hashPassword(plainPassword);
+    }
+
+    public boolean hasRole(Role role) {
+        return this.role == role;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return (
-            Objects.equals(id, user.id) &&
-            Objects.equals(username, user.username)
-        );
+        return (Objects.equals(this.username, user.username));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username);
+        return Objects.hash(username);
     }
 }
