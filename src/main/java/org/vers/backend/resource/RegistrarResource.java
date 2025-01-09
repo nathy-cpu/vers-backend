@@ -1,5 +1,6 @@
 package org.vers.backend.resource;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -7,15 +8,19 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import java.time.LocalDate;
+import java.util.StringTokenizer;
 import org.vers.backend.entity.BirthEvent;
 import org.vers.backend.entity.DeathEvent;
 import org.vers.backend.entity.DivorceEvent;
 import org.vers.backend.entity.Event;
 import org.vers.backend.entity.Location;
 import org.vers.backend.entity.MarriageEvent;
+import org.vers.backend.entity.Person;
 import org.vers.backend.entity.User;
 import org.vers.backend.enums.EventStatus;
 import org.vers.backend.enums.EventType;
@@ -30,6 +35,7 @@ import org.vers.backend.repository.UserRepository;
 @Path("/registrar")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RolesAllowed({ "REGISTRAR", "ADMIN" })
 public class RegistrarResource {
 
     @Inject
@@ -53,7 +59,10 @@ public class RegistrarResource {
     @POST
     @Path("/register-event")
     @Transactional
-    public Response registerEvent(EventRequest eventRequest) {
+    public Response registerEvent(
+        EventRequest eventRequest,
+        @Context SecurityContext securityContext
+    ) {
         Event event;
 
         Location location = new Location(
@@ -62,10 +71,10 @@ public class RegistrarResource {
             eventRequest.location.woreda
         );
 
+        location.persist();
         User registrar = userRepository
-            .findByUsername(eventRequest.registrar.username)
-            .orElse(null);
-
+            .findByUsername(securityContext.getUserPrincipal().getName())
+            .get();
         switch (eventRequest.type) {
             case "BIRTH":
                 event = new BirthEvent(
@@ -76,10 +85,25 @@ public class RegistrarResource {
                     eventRequest.birthWeight,
                     LocalDate.parse(eventRequest.dateOfBirth)
                 );
+
+                Person child = new Person();
+                StringTokenizer tokenizer = new StringTokenizer(
+                    eventRequest.childName,
+                    " "
+                );
+                child.firstName = tokenizer.nextToken();
+                child.middleName = tokenizer.nextToken();
+                child.lastName = tokenizer.nextToken();
+                child.dateOfBirth = LocalDate.parse(eventRequest.dateOfBirth);
+                child.gender = Gender.valueOf(eventRequest.gender);
+                child.phoneNumber = eventRequest.phoneNumber;
+                child.persist();
+
                 break;
             case "DEATH":
                 event = new DeathEvent(
                     eventRequest.deceasedName,
+                    Gender.valueOf(eventRequest.gender),
                     eventRequest.causeOfDeath,
                     eventRequest.certifierName,
                     LocalDate.parse(eventRequest.dateOfDeath)
@@ -234,6 +258,7 @@ public class RegistrarResource {
         public LocationDTO location;
         public UserDTO registrar;
         public String status;
+        public String phoneNumber;
     }
 
     public static class LocationDTO {
