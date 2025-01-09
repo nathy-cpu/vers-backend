@@ -8,9 +8,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Map;
 import java.util.Optional;
 import org.vers.backend.entity.User;
 import org.vers.backend.repository.UserRepository;
+import org.vers.backend.security.JwtUtils;
 
 @Path("/login")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -78,11 +80,12 @@ public class LoginResource {
                 .entity(new ErrorResponse("Wrong password!"))
                 .build();
         } else {
+            String token = JwtUtils.generateToken(
+                user.get().username,
+                user.get().role.toString()
+            );
             return Response.ok(
-                new LoginResponse(
-                    user.get().username,
-                    user.get().role.toString()
-                )
+                Map.of("token", token, "role", user.get().role.toString())
             ).build();
         }
     }

@@ -1,5 +1,6 @@
 package org.vers.backend.resource;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -9,7 +10,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
 import org.vers.backend.entity.User;
 import org.vers.backend.enums.Role;
 import org.vers.backend.repository.UserRepository;
@@ -17,6 +17,7 @@ import org.vers.backend.repository.UserRepository;
 @Path("/admin")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RolesAllowed({ "ADMIN" })
 public class AdminResource {
 
     @Inject
@@ -27,24 +28,27 @@ public class AdminResource {
     @Transactional
     public Response addUser(AddUserRequest addUserRequest) {
         // Check if the user already exists
-        if (userRepository.findByUsername(addUserRequest.username).isPresent()) {
+        if (
+            userRepository.findByUsername(addUserRequest.username).isPresent()
+        ) {
             return Response.status(Response.Status.CONFLICT)
-                    .entity(new ErrorResponse("User already exists."))
-                    .build();
+                .entity(new ErrorResponse("User already exists."))
+                .build();
         }
 
         // Create a new user
         User user = new User(
-                addUserRequest.username,
-                addUserRequest.password,
-                addUserRequest.email,
-                Role.valueOf(addUserRequest.role));
+            addUserRequest.username,
+            addUserRequest.password,
+            addUserRequest.email,
+            Role.valueOf(addUserRequest.role)
+        );
 
         user.persist();
 
         return Response.status(Response.Status.CREATED)
-                .entity(new SuccessResponse("User created successfully."))
-                .build();
+            .entity(new SuccessResponse("User created successfully."))
+            .build();
     }
 
     @DELETE
@@ -52,28 +56,33 @@ public class AdminResource {
     @Transactional
     public Response removeUser(RemoveUserRequest removeUserRequest) {
         User user = userRepository
-                .findByUsername(removeUserRequest.username)
-                .orElse(null);
+            .findByUsername(removeUserRequest.username)
+            .orElse(null);
 
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity(new ErrorResponse("User not found."))
-                    .build();
+                .entity(new ErrorResponse("User not found."))
+                .build();
         } else {
             user.delete();
 
             return Response.ok(
-                    new SuccessResponse("User removed successfully.")).build();
+                new SuccessResponse("User removed successfully.")
+            ).build();
         }
     }
 
     @POST
     @Path("/search-user")
     public Response searchUser(RemoveUserRequest removeUserRequest) {
-        User user = userRepository.findByUsername(removeUserRequest.username).orElse(null);
+        User user = userRepository
+            .findByUsername(removeUserRequest.username)
+            .orElse(null);
 
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity(new ErrorResponse("User not found.")).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                .entity(new ErrorResponse("User not found."))
+                .build();
         } else {
             return Response.ok(new FoundUserResponse(user)).build();
         }
@@ -90,6 +99,7 @@ public class AdminResource {
 
     // DTO for search User Response
     public static class FoundUserResponse {
+
         public String username;
         public String email;
         public String role;
