@@ -30,6 +30,7 @@ import org.vers.backend.repository.DeathEventRepository;
 import org.vers.backend.repository.DivorceEventRepository;
 import org.vers.backend.repository.EventRepository;
 import org.vers.backend.repository.MarriageEventRepository;
+import org.vers.backend.repository.LocationRepository;
 import org.vers.backend.repository.UserRepository;
 
 @Path("/registrar")
@@ -56,6 +57,9 @@ public class RegistrarResource {
     @Inject
     DivorceEventRepository divorceEventRepository;
 
+    @Inject
+    LocationRepository locationRepository;
+
     @POST
     @Path("/register-event")
     @Transactional
@@ -65,13 +69,23 @@ public class RegistrarResource {
     ) {
         Event event;
 
-        Location location = new Location(
+        // Check for existing location
+        Location location = locationRepository
+            .findByCompositeKey(
+                eventRequest.location.region,
+                eventRequest.location.zone,
+                eventRequest.location.woreda
+            )
+            .orElseGet(() -> {
+                Location newLoc = new Location(
             eventRequest.location.region,
             eventRequest.location.zone,
             eventRequest.location.woreda
         );
+                newLoc.persist();
+                return newLoc;
+            });
 
-        location.persist();
         User registrar = userRepository
             .findByUsername(securityContext.getUserPrincipal().getName())
             .get();
@@ -87,13 +101,15 @@ public class RegistrarResource {
                 );
 
                 Person child = new Person();
-                StringTokenizer tokenizer = new StringTokenizer(
-                    eventRequest.childName,
-                    " "
-                );
-                child.firstName = tokenizer.nextToken();
-                child.middleName = tokenizer.nextToken();
-                child.lastName = tokenizer.nextToken();
+                String[] nameParts = eventRequest.childName.trim().split("\\s+");
+                if (nameParts.length != 3) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ErrorResponse("Child name must have first, middle, and last name."))
+                        .build();
+                }
+                child.firstName = nameParts[0];
+                child.middleName = nameParts[1];
+                child.lastName = nameParts[2];
                 child.dateOfBirth = LocalDate.parse(eventRequest.dateOfBirth);
                 child.gender = Gender.valueOf(eventRequest.gender);
                 child.phoneNumber = eventRequest.phoneNumber;
@@ -147,6 +163,23 @@ public class RegistrarResource {
     public Response updateEvent(EventRequest eventRequest) {
         Event existingEvent;
 
+        // Check for existing location
+        Location location = locationRepository
+            .findByCompositeKey(
+                eventRequest.location.region,
+                eventRequest.location.zone,
+                eventRequest.location.woreda
+            )
+            .orElseGet(() -> {
+                Location newLoc = new Location(
+                    eventRequest.location.region,
+                    eventRequest.location.zone,
+                    eventRequest.location.woreda
+                );
+                newLoc.persist();
+                return newLoc;
+            });
+
         switch (eventRequest.type) {
             case "BIRTH":
                 existingEvent = birthEventRepository
@@ -161,12 +194,12 @@ public class RegistrarResource {
             case "MARRIAGE":
                 existingEvent = marriageEventRepository
                     .findBySpouseName(eventRequest.maleSpouseName)
-                    .getFirst();
+                    .stream().findFirst().orElse(null);
                 break;
             case "DIVORCE":
                 existingEvent = divorceEventRepository
                     .findBySpouseName(eventRequest.maleSpouseName)
-                    .getFirst();
+                    .stream().findFirst().orElse(null);
                 break;
             default:
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -181,12 +214,6 @@ public class RegistrarResource {
         }
 
         // Update common fields
-        Location location = new Location(
-            eventRequest.location.region,
-            eventRequest.location.zone,
-            eventRequest.location.woreda
-        );
-
         existingEvent.location = location;
         existingEvent.type = EventType.valueOf(eventRequest.type);
         existingEvent.status = EventStatus.valueOf(eventRequest.status);

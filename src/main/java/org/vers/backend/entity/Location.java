@@ -8,6 +8,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
+    name = "location",
     uniqueConstraints = @UniqueConstraint(
         columnNames = { "region", "zone", "woreda" }
     )

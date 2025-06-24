@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import org.vers.backend.entity.User;
 import org.vers.backend.enums.Role;
 import org.vers.backend.repository.UserRepository;
+import org.vers.backend.service.UserService;
 
 @Path("/admin")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -22,6 +23,9 @@ public class AdminResource {
 
     @Inject
     UserRepository userRepository;
+
+    @Inject
+    UserService userService;
 
     @POST
     @Path("/add-user")
@@ -44,7 +48,7 @@ public class AdminResource {
             Role.valueOf(addUserRequest.role)
         );
 
-        user.persist();
+        userService.registerUser(user);
 
         return Response.status(Response.Status.CREATED)
             .entity(new SuccessResponse("User created successfully."))

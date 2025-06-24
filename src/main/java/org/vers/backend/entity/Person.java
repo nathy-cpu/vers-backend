@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -14,6 +15,7 @@ import org.vers.backend.enums.Gender;
 import org.vers.backend.validation.InternationalPhone;
 
 @Entity
+@Table(name = "person")
 public class Person extends PanacheEntity {
 
     @NotBlank

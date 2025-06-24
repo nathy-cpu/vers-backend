@@ -25,7 +25,10 @@ public class UserService {
     }
 
     public User registerUser(User user) {
-        user.setPassword(PasswordUtils.hashPassword(user.password));
+        // Only hash if not already hashed (bcrypt hashes start with $2)
+        if (user.password == null || !user.password.startsWith("$2")) {
+            user.setPassword(user.password);
+        }
         userRepository.persist(user);
         return user;
     }
