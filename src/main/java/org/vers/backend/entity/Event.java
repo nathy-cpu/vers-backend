@@ -15,8 +15,10 @@ import java.time.LocalDate;
 import org.vers.backend.enums.EventStatus;
 import org.vers.backend.enums.EventType;
 import org.vers.backend.validation.ValidLocation;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "event")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Event extends PanacheEntity {

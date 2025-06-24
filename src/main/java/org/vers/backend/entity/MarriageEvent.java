@@ -3,9 +3,11 @@ package org.vers.backend.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "marriage_event")
 @DiscriminatorValue("MARRIAGE")
 public class MarriageEvent extends Event {
 

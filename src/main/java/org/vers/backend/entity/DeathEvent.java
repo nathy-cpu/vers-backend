@@ -3,10 +3,12 @@ package org.vers.backend.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import org.vers.backend.enums.Gender;
 
 @Entity
+@Table(name = "death_event")
 @DiscriminatorValue("DEATH")
 public class DeathEvent extends Event {
 

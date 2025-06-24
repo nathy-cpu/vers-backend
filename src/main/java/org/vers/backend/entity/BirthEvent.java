@@ -7,8 +7,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
 import org.vers.backend.enums.Gender;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "birth_event")
 @DiscriminatorValue("BIRTH")
 public class BirthEvent extends Event {
 
