@@ -9,6 +9,7 @@ import org.vers.backend.enums.Role;
 import org.vers.backend.repository.UserRepository;
 import jakarta.inject.Inject;
 import org.vers.backend.security.JwtUtils;
+import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -20,21 +21,19 @@ public class RegistrarResourceTest {
     @Inject
     UserRepository userRepository;
 
-    String registrarToken;
-
-    @BeforeAll
-    @Transactional
-    void setup() {
-        if (userRepository.findByUsername("registrar").isEmpty()) {
-            User registrar = new User("registrar", "$2a$10$7QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8QJ8Q", "registrar@example.com", Role.REGISTRAR);
-            registrar.persist();
-        }
-        registrarToken = JwtUtils.generateToken("registrar", "REGISTRAR");
-    }
-
     @Test
     @Transactional
     void testRegisterBirthEvent() {
+        // Simulate login as registrar to get a valid JWT
+        String registrarToken = given()
+            .contentType(ContentType.JSON)
+            .body(new LoginResource.LoginRequest("registrar", "registrarpass"))
+        .when()
+            .post("/login")
+        .then()
+            .statusCode(200)
+            .extract().path("token");
+
         var eventRequest = new RegistrarResource.EventRequest();
         eventRequest.type = "BIRTH";
         eventRequest.childName = "Test Child Name";
