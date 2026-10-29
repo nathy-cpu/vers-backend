@@ -12,6 +12,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.vers.backend.enums.EventStatus;
 import org.vers.backend.enums.EventType;
 import org.vers.backend.validation.ValidLocation;
@@ -42,6 +43,16 @@ public abstract class Event extends PanacheEntity {
     @ValidLocation
     @JoinColumn(name = "location_id", nullable = false)
     public Location location;
+
+    @ManyToOne
+    @JoinColumn(name = "reviewed_by", referencedColumnName = "username")
+    public User reviewedBy;
+
+    @Column
+    public LocalDateTime reviewedAt;
+
+    @Column
+    public String rejectionReason;
 
     public Event() {
         this.dateOfRegistration = LocalDate.now();

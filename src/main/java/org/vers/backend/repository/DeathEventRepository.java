@@ -9,10 +9,6 @@ import org.vers.backend.entity.DeathEvent;
 @ApplicationScoped
 public class DeathEventRepository implements PanacheRepository<DeathEvent> {
 
-    public Optional<DeathEvent> findById(Integer id) {
-        return find("id", id).firstResultOptional();
-    }
-
     public Optional<DeathEvent> findByDeceasedName(String deceasedName) {
         return find("deceasedName", deceasedName).firstResultOptional();
     }

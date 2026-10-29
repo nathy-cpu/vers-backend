@@ -1,10 +1,13 @@
 package org.vers.backend.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import org.vers.backend.enums.Gender;
 import jakarta.persistence.Table;
@@ -33,6 +36,10 @@ public class BirthEvent extends Event {
     @Column(nullable = false)
     public LocalDate dateOfBirth;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "child_id")
+    public Person child;
+
     public BirthEvent() {}
 
     public BirthEvent(
@@ -47,6 +54,7 @@ public class BirthEvent extends Event {
         this.fatherName = fatherName;
         this.motherName = motherName;
         this.gender = gender;
+        this.birthWeight = birthWeight;
         this.dateOfBirth = dateOfBirth;
     }
 

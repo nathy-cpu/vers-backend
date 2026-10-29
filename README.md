@@ -1,66 +1,54 @@
-# org.example.hello-world
+# VERS backend
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+REST API for the Vital Events Registration System: registrars record births,
+deaths, marriages and divorces; officials and admins review them and generate
+reports; admins manage users. Built with Quarkus, PostgreSQL and JWT auth.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Setup
 
-## Running the application in dev mode
+Requires JDK 21 and PostgreSQL.
 
-You can run your application in dev mode that enables live coding using:
+1. Create the databases (defaults: user/password `quarkus`/`quarkus`, override
+   with `DB_URL`, `DB_USER`, `DB_PASSWORD`; tests use `TEST_DB_URL`):
 
-```shell script
-./mvnw quarkus:dev
-```
+   ```shell script
+   sudo -u postgres psql -c "CREATE ROLE quarkus LOGIN PASSWORD 'quarkus';" \
+     -c "CREATE DATABASE quarkus OWNER quarkus;" \
+     -c "CREATE DATABASE quarkus_test OWNER quarkus;"
+   ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+2. Generate the JWT signing key pair. `privateKey.pem` is git-ignored; never commit it.
 
-## Packaging and running the application
+   ```shell script
+   cd src/main/resources
+   openssl genrsa -out rsa.pem 2048
+   openssl pkcs8 -topk8 -nocrypt -in rsa.pem -out privateKey.pem
+   openssl rsa -in rsa.pem -pubout -out publicKey.pem && rm rsa.pem
+   ```
 
-The application can be packaged using:
+3. Run in dev mode on <http://localhost:8080>:
 
-```shell script
-./mvnw package
-```
+   ```shell script
+   ./mvnw quarkus:dev
+   ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+On startup, users `admin`/`adminpass`, `registrar`/`registrarpass` and
+`official`/`officialpass` are created if missing. Change those passwords
+before deploying anywhere real.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+API docs: <http://localhost:8080/swagger-ui>. Tests (`./mvnw test`) recreate the
+`quarkus_test` database on every run.
 
-If you want to build an _über-jar_, execute the following command:
+## API overview
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
+| Path | Roles | Purpose |
+|---|---|---|
+| `POST /login` | anyone | Returns `{token, role, username}` |
+| `GET /me`, `PUT /me/password` | any logged-in user | Own account |
+| `/admin/...` | ADMIN | Add, list, search and remove users |
+| `POST /registrar/register-event`, `GET/PUT /registrar/events[/{id}]` | REGISTRAR, ADMIN | Register, search and edit events |
+| `GET /official/events`, `POST /official/events/{id}/approve\|reject` | OFFICIAL, ADMIN | Review events |
+| `GET /official/reports`, `GET /official/reports/filters` | OFFICIAL, ADMIN | Statistics with optional filters |
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/org.example.hello-world-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- RESTEasy Reactive ([guide](https://quarkus.io/guides/resteasy-reactive)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+New and edited events are `PENDING` until an official or admin approves or
+rejects them. Nobody can review an event they registered.

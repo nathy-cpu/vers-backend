@@ -3,6 +3,8 @@ package org.vers.backend.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import org.vers.backend.enums.Gender;
@@ -16,6 +18,7 @@ public class DeathEvent extends Event {
     public String deceasedName;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     public Gender gender;
 
     @Column(nullable = false)
@@ -27,6 +30,9 @@ public class DeathEvent extends Event {
     @Column(nullable = false)
     public LocalDate dateOfDeath;
 
+    @Column(nullable = false)
+    public String placeOfDeath;
+
     public DeathEvent() {}
 
     public DeathEvent(
@@ -34,13 +40,15 @@ public class DeathEvent extends Event {
         Gender gender,
         String causeOfDeath,
         String certifierName,
-        LocalDate dateOfDeath
+        LocalDate dateOfDeath,
+        String placeOfDeath
     ) {
         this.deceasedName = deceasedName;
         this.certifierName = certifierName;
         this.dateOfDeath = dateOfDeath;
         this.causeOfDeath = causeOfDeath;
         this.gender = gender;
+        this.placeOfDeath = placeOfDeath;
     }
 
     @Override
@@ -58,6 +66,9 @@ public class DeathEvent extends Event {
             '\'' +
             ", dateOfDeath=" +
             dateOfDeath +
+            ", placeOfDeath='" +
+            placeOfDeath +
+            '\'' +
             '}'
         );
     }

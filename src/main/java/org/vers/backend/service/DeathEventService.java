@@ -13,7 +13,7 @@ public class DeathEventService {
     DeathEventRepository deathEventRepository;
 
     public Optional<DeathEvent> findById(Long id) {
-        return Optional.of(deathEventRepository.findById(id));
+        return deathEventRepository.findByIdOptional(id);
     }
 
     public void registerDeathEvent(DeathEvent deathEvent) {

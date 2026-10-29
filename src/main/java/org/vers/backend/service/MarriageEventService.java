@@ -12,8 +12,8 @@ public class MarriageEventService {
     @Inject
     MarriageEventRepository marriageEventRepository;
 
-    public Optional<MarriageEvent> findById(Integer id) {
-        return marriageEventRepository.findById(id);
+    public Optional<MarriageEvent> findById(Long id) {
+        return marriageEventRepository.findByIdOptional(id);
     }
 
     public void registerMarriageEvent(MarriageEvent marriageEvent) {

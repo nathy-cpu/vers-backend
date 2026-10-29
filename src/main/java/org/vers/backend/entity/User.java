@@ -30,13 +30,13 @@ public class User extends PanacheEntityBase {
     )
     public String username;
 
+    // Bcrypt hash. Plain-password rules are enforced where passwords are set.
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
-    public String password; // Hashed password
+    public String password;
 
     @NotNull(message = "Role is required")
     @Enumerated(EnumType.STRING)
-    public Role role; // Using a String for roles to match the database schema
+    public Role role;
 
     @Email(message = "Invalid email address")
     @Column(nullable = false, unique = true)
@@ -51,7 +51,7 @@ public class User extends PanacheEntityBase {
     }
 
     // Constructors
-    public User(@NotBlank(message = "Role is required") Role role) {
+    public User(Role role) {
         this.createdAt = LocalDateTime.now();
         this.role = role;
     }
@@ -66,7 +66,7 @@ public class User extends PanacheEntityBase {
         String username,
         String plainPassword,
         String email,
-        @NotBlank(message = "Role is required") Role role
+        Role role
     ) {
         this.username = username;
         this.setPassword(plainPassword);

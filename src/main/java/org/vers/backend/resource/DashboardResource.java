@@ -5,7 +5,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
- * REST endpoint to serve the Svelte dashboard page.
+ * Public welcome message; needs no login.
  */
 @Path("/dashboard")
 @Produces(MediaType.APPLICATION_JSON)

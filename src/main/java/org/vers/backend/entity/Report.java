@@ -1,16 +1,14 @@
 package org.vers.backend.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "report")
@@ -23,6 +21,8 @@ public class Report extends PanacheEntity {
     @JoinColumn(nullable = false, name = "generated_by")
     public User generatedBy;
 
+    // Raw JSON text, stored in a jsonb column
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     public String data;
 
@@ -45,16 +45,5 @@ public class Report extends PanacheEntity {
             '\'' +
             '}'
         );
-    }
-
-    public JsonNode getData()
-        throws JsonMappingException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree(this.data);
-    }
-
-    public void setData(JsonNode jsonData) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.data = objectMapper.writeValueAsString(jsonData);
     }
 }

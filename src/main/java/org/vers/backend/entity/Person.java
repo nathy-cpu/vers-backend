@@ -8,7 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.time.Period;
 import org.vers.backend.enums.Gender;
@@ -34,14 +34,14 @@ public class Person extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     public Gender gender;
 
-    @Past
+    @PastOrPresent
     @NotNull
     @Column(nullable = false)
     public LocalDate dateOfBirth;
 
-    @NotNull
+    // Optional: a newborn has no phone number of its own
     @InternationalPhone
-    @Column(nullable = false)
+    @Column
     public String phoneNumber;
 
     public Person() {}

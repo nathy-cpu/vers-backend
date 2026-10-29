@@ -1,6 +1,5 @@
 package org.vers.backend.resource;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -10,9 +9,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Map;
 import java.util.Optional;
+import org.vers.backend.dto.ErrorResponse;
 import org.vers.backend.entity.User;
-import org.vers.backend.repository.UserRepository;
 import org.vers.backend.security.JwtUtils;
+import org.vers.backend.service.UserService;
 
 @Path("/login")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -25,68 +25,42 @@ public class LoginResource {
         public String username;
         public String password;
 
+        public LoginRequest() {}
+
         public LoginRequest(String username, String password) {
             this.username = username;
             this.password = password;
         }
     }
 
-    // DTO for login response
-    public static class LoginResponse {
-
-        public String username;
-        public String role;
-
-        public LoginResponse(String username, String role) {
-            this.username = username;
-            this.role = role;
-        }
-    }
-
-    // DTO for error response
-    public static class ErrorResponse {
-
-        public String error;
-
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-    }
-
     @Inject
-    UserRepository userRepository;
+    UserService userService;
 
     @POST
     public Response login(LoginRequest loginRequest) {
-        Optional<User> user = userRepository.findByUsername(
-            loginRequest.username
-        );
-
-        if (user.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                .entity(new ErrorResponse("Username not found!"))
-                .build();
-        }
-
+        Optional<User> user = Optional.empty();
         if (
-            !BCrypt.verifyer()
-                .verify(
-                    loginRequest.password.toCharArray(),
-                    user.get().password
-                )
-                .verified
+            loginRequest != null &&
+            loginRequest.username != null &&
+            loginRequest.password != null
         ) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                .entity(new ErrorResponse("Wrong password!"))
-                .build();
-        } else {
-            String token = JwtUtils.generateToken(
-                user.get().username,
-                user.get().role.toString()
+            user = userService.authenticate(
+                loginRequest.username,
+                loginRequest.password
             );
-            return Response.ok(
-                Map.of("token", token, "role", user.get().role.toString())
-            ).build();
         }
+
+        // Same answer for unknown user and wrong password, so usernames can't be probed
+        if (user.isEmpty()) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                .entity(new ErrorResponse("Invalid username or password."))
+                .build();
+        }
+
+        String role = user.get().role.toString();
+        String token = JwtUtils.generateToken(user.get().username, role);
+        return Response.ok(
+            Map.of("token", token, "role", role, "username", user.get().username)
+        ).build();
     }
 }

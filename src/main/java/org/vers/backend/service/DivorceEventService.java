@@ -12,8 +12,8 @@ public class DivorceEventService {
     @Inject
     DivorceEventRepository divorceEventRepository;
 
-    public Optional<DivorceEvent> findById(Integer id) {
-        return divorceEventRepository.findById(id);
+    public Optional<DivorceEvent> findById(Long id) {
+        return divorceEventRepository.findByIdOptional(id);
     }
 
     public void registerDivorceEvent(DivorceEvent divorceEvent) {

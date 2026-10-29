@@ -4,15 +4,10 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
-import java.util.Optional;
 import org.vers.backend.entity.Report;
 
 @ApplicationScoped
 public class ReportRepository implements PanacheRepository<Report> {
-
-    public Optional<Report> findById(Integer id) {
-        return find("id", id).firstResultOptional();
-    }
 
     public List<Report> findByUser(String username) {
         return list("generatedBy.username", username);

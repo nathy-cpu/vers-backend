@@ -12,8 +12,8 @@ public class BirthEventService {
     @Inject
     BirthEventRepository birthEventRepository;
 
-    public Optional<BirthEvent> findById(Integer id) {
-        return birthEventRepository.findById(id);
+    public Optional<BirthEvent> findById(Long id) {
+        return birthEventRepository.findByIdOptional(id);
     }
 
     public void registerBirthEvent(BirthEvent birthEvent) {

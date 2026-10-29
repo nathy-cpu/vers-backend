@@ -9,10 +9,6 @@ import org.vers.backend.entity.BirthEvent;
 @ApplicationScoped
 public class BirthEventRepository implements PanacheRepository<BirthEvent> {
 
-    public Optional<BirthEvent> findById(Integer id) {
-        return find("id", id).firstResultOptional();
-    }
-
     public Optional<BirthEvent> findByChildName(String childName) {
         return find("childName", childName).firstResultOptional();
     }

@@ -14,16 +14,15 @@ public class PersonService {
     PersonRepository personRepository;
 
     public Optional<Person> findById(Long id) {
-        return Optional.of(personRepository.findById(id));
+        return personRepository.findByIdOptional(id);
     }
 
     public Person createOrUpdatePerson(Person person) {
-        if (!personRepository.findById(person.id).isEmpty()) {
+        if (person.id == null) {
             personRepository.persist(person);
-        } else {
-            personRepository.getEntityManager().merge(person);
+            return person;
         }
-        return person;
+        return personRepository.getEntityManager().merge(person);
     }
 
     public List<Person> findAllPersons() {
